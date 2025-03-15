@@ -1,0 +1,8 @@
+.gradle/
+build/
+
+# Intellij
+.idea/
+iml/
+# Gradle wrapper
+gradle/wrapper/gradle-wrapper.jar

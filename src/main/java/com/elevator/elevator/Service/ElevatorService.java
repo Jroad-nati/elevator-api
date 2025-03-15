@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public class ElevatorService {
 
     private final static String DIRECTION_UP = "UP";
     private final static String DIRECTION_DOWN = "DOWN";
+    private final static List<String> logs= new ArrayList<>(); //Used only to show the steps in the client when the elevator is moving
 
     private final List<Elevator> elevators;
 
@@ -28,24 +30,42 @@ public class ElevatorService {
 
     public Elevator getNearestElevator(int floor, String direction) {
         // Choose the nearest optimal elevator and make available for the users
-        Elevator nearestElevator = elevators.getFirst();
-        int mdistance = Integer.MAX_VALUE;
-        for (Elevator e : elevators) {
-            int distance = Math.abs(e.getCurrentFloor() - floor);
-            if (e.getElevatorState().equals(ElevatorState.IDLE) ||
-                    ((direction.equalsIgnoreCase(DIRECTION_UP) && e.getCurrentFloor() <= floor) || (direction.equalsIgnoreCase(DIRECTION_DOWN) && e.getCurrentFloor() >= floor))) {
-                if (distance <= mdistance) {
-                    mdistance = distance;
-                    nearestElevator = e;
+        Elevator nearestElevator = findNearestOptimalElevator(floor, direction);
+        // If a nearest elevator is found, set its state and floor accordingly
+        if (nearestElevator != null) {
+            setElevatorState(nearestElevator, direction, floor);
+        }
+        return nearestElevator;
+    }
+
+    private Elevator findNearestOptimalElevator(int floor, String direction) {
+        Elevator nearestElevator = null;
+        int minimumDistance = Integer.MAX_VALUE;
+        for (Elevator elevator : elevators) {
+            int distance = Math.abs(elevator.getCurrentFloor() - floor);
+            if (isElevatorSuitableForDirection(elevator, direction, floor)) {
+                if (distance < minimumDistance) {
+                    minimumDistance = distance;
+                    nearestElevator = elevator;
                 }
             }
         }
-        //Set the state of the elevator according to the users direction and floor number
-        ElevatorState elevatorState = direction.equalsIgnoreCase(DIRECTION_UP) ? ElevatorState.UP : ElevatorState.DOWN;
-        nearestElevator.setElevatorState(elevatorState);
-        nearestElevator.setCurrentFloor(floor);
-        return nearestElevator;
+        return nearestElevator ;
     }
+
+    private boolean isElevatorSuitableForDirection(Elevator elevator, String direction, int floor) {
+        //Assumption: take elevator which is free or in the direction of the request
+        //It is possible to make more efficient  usage.
+        return elevator.getElevatorState().equals(ElevatorState.IDLE) ||
+                ((direction.equalsIgnoreCase(DIRECTION_UP) && elevator.getCurrentFloor() <= floor) || (direction.equalsIgnoreCase(DIRECTION_DOWN) && elevator.getCurrentFloor() >= floor));
+    }
+
+    private void setElevatorState(Elevator elevator, String direction, int floor) {
+        ElevatorState elevatorState = direction.equalsIgnoreCase(DIRECTION_UP) ? ElevatorState.UP : ElevatorState.DOWN;
+        elevator.setElevatorState(elevatorState);
+        elevator.setCurrentFloor(floor);
+    }
+
 
     public void enqueuePassengerStop(String elevatorId, int destination) {
         log.info("Elevator {} is in the queue and heading to floor {}", elevatorId, destination);
@@ -58,20 +78,23 @@ public class ElevatorService {
     }
 
 
-    public void moveElevator(String elevatorId) {
+    public List<String> moveElevator(String elevatorId) {
+        logs.clear();
         Optional<Elevator> elevator = elevators.stream().filter(e -> e.getElevatorId().equals(elevatorId)).findFirst();
         if (elevator.isEmpty()) {
             throw new IllegalArgumentException("There is no elevator with this id");
         }
-        //The elevator is moving first in the direction of where it is requested in the very first time
+        //Assumption: The elevator is moving first in the direction of where it is requested in the very first time
         if (elevator.get().getElevatorState().name().equalsIgnoreCase("up") && !elevator.get().getMoveUpQueue().isEmpty()) {
             moveElevatorUP(elevator.get());
         } else if (elevator.get().getElevatorState().name().equalsIgnoreCase("down") && !elevator.get().getMoveDownQueue().isEmpty()) {
             moveElevatorDOWN(elevator.get());
         }
+        return logs;
     }
 
 
+    //Need more refactoring and break down
     private void moveElevatorUP(Elevator elevator) {
         while (!elevator.getMoveUpQueue().isEmpty()) {
             Integer stop = elevator.getMoveUpQueue().pollFirst();

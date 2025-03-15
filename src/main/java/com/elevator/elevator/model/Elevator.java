@@ -15,18 +15,11 @@ import java.util.*;
 @AllArgsConstructor
 public class Elevator   {
 
-    private static final int MAX_FLOOR = 10;
     private String elevatorId ;
-    private int currentFloor;
+    private Integer currentFloor;
     private ElevatorState elevatorState;
-
     private  TreeSet<Integer> moveUpQueue ;  // I choose tree bc of it ordered and avoid duplicate stop
     private TreeSet<Integer> moveDownQueue;
-
-
-
-
-
 
     public Elevator(String id) {
         this.elevatorId = id;
@@ -35,6 +28,4 @@ public class Elevator   {
         this.moveUpQueue = new TreeSet<>();
         this.moveDownQueue = new TreeSet<>();
     }
-
-
 }

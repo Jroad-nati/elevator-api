@@ -20,6 +20,9 @@ public class ElevatorController {
         this.elevatorService = elevatorService;
     }
 
+    //Simple get requests and possible to use RestTemplate and create request id but it is overkill and need more time
+    // I didn't implement for error handling
+
     @GetMapping("/all")
     public List<Elevator> getElevatorStatus() {
         return elevatorService.getElevators();
@@ -39,8 +42,10 @@ public class ElevatorController {
     }
 
     @GetMapping("/move-elevator")
-    public void moveElevator(@RequestParam String elevatorId) {
-        elevatorService.moveElevator(elevatorId);
+    public List<String> moveElevator(@RequestParam String elevatorId) {
+      return  elevatorService.moveElevator(elevatorId);
     }
+
+
 
 }
