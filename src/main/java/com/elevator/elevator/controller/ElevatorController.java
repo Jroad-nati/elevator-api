@@ -28,10 +28,10 @@ public class ElevatorController {
         this.elevatorMotionService = elevatorMotionService;
         this.logService = logService;
     }
-
-    //Possible to use RestTemplate and create request id.But  it is overkill and need more time
-    // I didn't implement for error handling
-    // This project handle only one elevator request at a time
+     //TODO: implement error handling
+    //TODO: implement to handle multiples elevators request at a time from different floors
+    //TODO: implement to handle multiple floors
+   // TODO: RestTemplate
 
     @GetMapping("/all")
     public List<Elevator> getElevatorStatus() {
