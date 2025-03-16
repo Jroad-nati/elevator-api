@@ -3,9 +3,8 @@ package com.elevator.elevator.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Service;
+
 
 import java.util.*;
 
@@ -28,4 +27,15 @@ public class Elevator   {
         this.moveUpQueue = new TreeSet<>();
         this.moveDownQueue = new TreeSet<>();
     }
+
+    public void setElevatorInstanceState(Elevator elevator, ElevatorState elevatorState) {
+       elevator.setElevatorState(elevatorState);
+    }
+
+    public void setElevatorInstanceState(Elevator elevator, ElevatorState elevatorState,int floor) {
+        elevator.setElevatorState(elevatorState);
+        elevator.setCurrentFloor(floor);
+    }
+
+
 }
