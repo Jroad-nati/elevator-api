@@ -5,9 +5,7 @@ import com.elevator.elevator.model.Elevator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Configuration
 public class StartElevator {
@@ -20,5 +18,12 @@ public class StartElevator {
                 new Elevator("D"),
                 new Elevator("E")
         );
+    }
+
+    // This queue will be used to store the elevators in the order of their priority
+    // Did not finish full implementation
+    @Bean
+    public Queue<Elevator> elevatorQueue() {
+        return new LinkedList<>(); // Using LinkedList as a FIFO queue
     }
 }
