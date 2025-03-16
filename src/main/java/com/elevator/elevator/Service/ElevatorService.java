@@ -26,7 +26,6 @@ public class ElevatorService {
 
 
     public Elevator getNearestOptimalElevator(int floor, String direction) {
-        logService.clearLogs(); // clear out and store new logs for each elevator request
         Elevator nearestElevator = findElevator(floor, direction);
         if (nearestElevator != null) {
             ElevatorState elevatorState = direction.equalsIgnoreCase(Constant.DIRECTION_UP) ? ElevatorState.UP : ElevatorState.DOWN;
